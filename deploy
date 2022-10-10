@@ -146,7 +146,7 @@ systemctl status zabbix-agent | grep Active
 systemctl status grafana-server | grep Active
 figlet -w 100 -f smmono9 "INSTALANDO ACERVO DE MIBs!" | lolcat
 cd /usr/share/snmp/mibs
-git clone https://github.com/arturbrasil/vendors.git
+git clone https://github.com/romesrmj/zabbix/vendors.git
 
 #for i in `ls -d /usr/share/snmp/mibs/vendors/*/`; do
 # echo "mibdirs +$i" > $HOME/.snmp/snmp.conf
@@ -155,7 +155,7 @@ git clone https://github.com/arturbrasil/vendors.git
 
 clear
 cd /tmp
-wget https://raw.githubusercontent.com/arturbrasil/curriculo/gh-pages/zabbix-datasource
+wget https://raw.githubusercontent.com/romesrmj/zabbix/main/data-source
 
 for i in /tmp/zabbix-datasource ; do \
     curl -X "POST" "http://127.0.0.1:3000/api/datasources" \
@@ -169,7 +169,7 @@ grafana_cred="admin:admin"
 grafana_datasource="zabbix"
 apt install -y parallel jq curl httpie nmap ncat dnsutils unzip snmp-mibs-downloader htop speedtest-cli iotop nmap silversearcher-ag ngrep -y   > /dev/null 2>&1
 snap install gotop
-wget https://raw.githubusercontent.com/arturbrasil/curriculo/gh-pages/dash-redes-sociais.json
+wget https://raw.githubusercontent.com/romesrmj/zabbix/main/dash-redes-sociais.json
 
 cat dash-redes-sociais.json | jq '. * {overwrite: true, dashboard: {id: null}}' | curl -s -k -u "$grafana_cred" -XPOST -H "Accept: application/json" \
     -H "Content-Type: application/json" \
