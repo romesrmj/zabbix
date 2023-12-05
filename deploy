@@ -1,9 +1,11 @@
 #!/bin/bash
-
+pro config set apt_news=false
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
 apt update
 apt install -y ruby screen figlet toilet cowsay lolcat boxes  > /dev/null 2>&1
-toilet -w 100 -f smmono9 Zabbix deploy services | lolcat
-toilet -w 82 -f mini Iniciando... | lolcat
+toilet -w 100 -f smmono9 Zabbix 6.2 | lolcat
+toilet -w 80 -f mini Iniciando | lolcat
 gem install apt-spy2
 # apt-spy2 fix --commit
 cd /tmp 
@@ -19,8 +21,8 @@ apt install zabbix-server-mysql zabbix-frontend-php  zabbix-agent -y
 apt instll zabbix-sql-scripts zabbix-apache-conf  -y
 
 clear
-toilet -w 82 -f mini Zabbix deploy | lolcat
-toilet -w 100 -f smmono9 deploy by romes morais | lolcat
+toilet -w 82 -f mini Zabbix | lolcat
+toilet -w 100 -f smmono9 Zabbix 6.2 | lolcat
 rm /tmp/finish
 apt install -y mysql-server mysql-client
 apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent 
@@ -54,6 +56,7 @@ mysql -uroot --password="" -e "SELECT host, user FROM mysql.user";
 mysql -uroot --password="" -e "SHOW GRANTS FOR 'zabbix'@'localhost'";
 
 figlet -w 100 -f smmono9 "CRIANDO BANCO DE DADOS!" | lolcat
+figlet -w 100 -f smmono9  "PODE DEMORAR!"  | lolcat
 figlet -w 100 -f smmono9 "AGUARDE!"  | lolcat
 
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | pv --progress --size  `gzip -l /usr/share/zabbix-sql-scripts/mysql/server.sql.gz  | sed -n 2p | awk '{print $2}'` | mysql --default-character-set=utf8mb4 -uroot --password="" zabbix
@@ -146,7 +149,7 @@ systemctl status zabbix-agent | grep Active
 systemctl status grafana-server | grep Active
 figlet -w 100 -f smmono9 "INSTALANDO ACERVO DE MIBs!" | lolcat
 cd /usr/share/snmp/mibs
-git clone https://github.com/romesrmj/zabbix/vendors.git
+git clone https://github.com/arturbrasil/vendors.git
 
 #for i in `ls -d /usr/share/snmp/mibs/vendors/*/`; do
 # echo "mibdirs +$i" > $HOME/.snmp/snmp.conf
@@ -155,7 +158,7 @@ git clone https://github.com/romesrmj/zabbix/vendors.git
 
 clear
 cd /tmp
-wget https://raw.githubusercontent.com/romesrmj/zabbix/main/data-source
+wget https://raw.githubusercontent.com/arturbrasil/curriculo/gh-pages/zabbix-datasource
 
 for i in /tmp/zabbix-datasource ; do \
     curl -X "POST" "http://127.0.0.1:3000/api/datasources" \
@@ -169,7 +172,7 @@ grafana_cred="admin:admin"
 grafana_datasource="zabbix"
 apt install -y parallel jq curl httpie nmap ncat dnsutils unzip snmp-mibs-downloader htop speedtest-cli iotop nmap silversearcher-ag ngrep -y   > /dev/null 2>&1
 snap install gotop
-wget https://raw.githubusercontent.com/romesrmj/zabbix/main/dash-redes-sociais.json
+wget https://raw.githubusercontent.com/arturbrasil/curriculo/gh-pages/dash-redes-sociais.json
 
 cat dash-redes-sociais.json | jq '. * {overwrite: true, dashboard: {id: null}}' | curl -s -k -u "$grafana_cred" -XPOST -H "Accept: application/json" \
     -H "Content-Type: application/json" \
@@ -199,7 +202,10 @@ ls  -d /usr/share/snmp/mibs/vendors/*/ | xargs -n1 echo mibdirs +  >> /etc/snmp/
 
 EOF
 . ~/.bashrc 
-alias fixmibs="MIBDIRS=`ls  -d /usr/share/snmp/mibs/*/*/| xargs | tr ' ' ':'`"
+alias fixmibs="MIBDIRS=/usr/share/snmp/mibs/iana/:/usr/share/snmp/mibs/ietf/:/usr/share/snmp/mibs/vendors/:`ls  -d /usr/share/snmp/mibs/*/*/ | xargs | tr ' ' ':'`"
+
+wget https://raw.githubusercontent.com/arturbrasil/curriculo/gh-pages/whats.fix
+bash whats.fix
 systemctl enable zabbix-server zabbix-agent apache2 
 systemctl enable grafana-server
 touch /tmp/finish 
